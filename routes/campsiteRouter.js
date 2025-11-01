@@ -4,6 +4,7 @@ const Campsite = require('../models/campsite');
 
 const campsiteRouter = express.Router();
 
+//we define endpoints through this route method
 campsiteRouter.route('/')
 .get((req, res, next) => {
     Campsite.find()
