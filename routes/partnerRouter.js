@@ -40,6 +40,7 @@ partnerRouter.route('/')
 });
 
 // param
+// we could also chain and write .then(partner => res.status(200).json(partner)) in one line
 partnerRouter.route('/:partnerId')
 .get( (req, res, next) => {
     Partner.findById(req.params.partnerId)
