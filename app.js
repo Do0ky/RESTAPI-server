@@ -1,7 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+//var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
@@ -11,6 +11,8 @@ const promotionRouter = require ('./routes/promotionRouter');
 const partnerRouter = require ('./routes/partnerRouter');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
+const passport = require('passport');
+const authenticate = require('./authenticate');
 
 //Mongoose wrapper methods around the mongoDB node driver
 const mongoose = require('mongoose');
@@ -41,31 +43,29 @@ app.use(session({
   store: new FileStore()
 }));
 
+// two middleware functions provided by passport to check incoming requests to see if there is an existing session for that client
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // authentication middleware
-  function auth(req, res, next) {
-    console.log(req.session);
+function auth(req, res, next) {
+    console.log(req.user);
 
-    if (!req.session.user) {
-      const err = new Error('You are not authenticated!');
-      err.status = 401;
-      return next(err);
+    if (!req.user) {
+        const err = new Error('You are not authenticated!');
+        err.status = 401;
+        return next(err);
     } else {
-      if (req.session.user === 'authenticated') {
-          return next();
-      } else {
-          const err = new Error('You are not authenticated!');
-          err.status = 401;
-          return next(err);
-      }
+        return next();
     }
 }
 
-app.use(auth);
-
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(auth);
 
 app.use('/campsites', campsiteRouter);
 app.use('/promotions', promotionRouter);
