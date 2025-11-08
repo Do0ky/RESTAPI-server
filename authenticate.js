@@ -20,21 +20,31 @@ opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = config.secretKey;
 
 exports.jwtPassport = passport.use(
-    new JwtStrategy(
-        opts,
-        (jwt_payload, done) => {
-            console.log('JWT payload:', jwt_payload);
+  new JwtStrategy(
+    opts,
+    (jwt_payload, done) => {
+      console.log('JWT payload:', jwt_payload);
 
-            User.findOne({ _id: jwt_payload._id })
-            .then((user) => {
-              if (user) {
-                return done(null, user);
-              } else {
-                return done(null, false);
-              }
-            }).catch((err) => done(err, false));
+      User.findOne({ _id: jwt_payload._id })
+      .then((user) => {
+        if (user) {
+          return done(null, user);
+        } else {
+          return done(null, false);
         }
-    )
+      }).catch((err) => done(err, false));
+    }
+  )
 );
 
 exports.verifyUser = passport.authenticate('jwt', {session: false});
+
+exports.verifyAdmin = (req, res, next) => {
+  if (req.user.admin) {
+    return next(); // User is admin: proceed
+  } else {
+    const err = new Error('You are not authorized to perform this operation!');
+    err.status = 403;
+    return next(err); // User is not admin: block access
+  }
+};
