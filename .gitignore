@@ -1,3 +1,5 @@
 node_modules
 sessions
 config.js
+bin/server.cert
+bin/server.key
