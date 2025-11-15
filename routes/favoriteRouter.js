@@ -94,7 +94,7 @@ favoriteRouter.route('/:campsiteId')
                     .catch(err => next(err));
             } else {
                 res.statusCode = 200;
-                res.end('Campsite is already a favorite.');
+                res.end('That campsite is already a favorite!');
             }
         } else {
             Favorite.create({
